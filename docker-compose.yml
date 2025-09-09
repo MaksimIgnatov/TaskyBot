@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  taskybot:
+    build: .
+    container_name: taskybot
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - DATA_FILE=/app/data/tasks.json
+    volumes:
+      # Монтируем директорию с данными для сохранения задач
+      - ./data:/app/data
+      # Монтируем логи (опционально)
+      - ./logs:/app/logs
+    restart: unless-stopped
+    # Ограничиваем ресурсы
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+    # Добавляем healthcheck
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('https://api.telegram.org/bot${BOT_TOKEN}/getMe')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+# Создаем именованные тома для данных
+volumes:
+  taskybot_data:
+    driver: local
