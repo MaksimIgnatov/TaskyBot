@@ -131,3 +131,4 @@ dmypy.json
 # Bot specific
 tasks.json
 *.log
+docs/GITHUB_SETUP.md
